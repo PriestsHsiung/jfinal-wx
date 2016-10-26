@@ -5,7 +5,7 @@
 		<filter-class>com.jfinal.core.JFinalFilter</filter-class>
 		<init-param>
 			<param-name>configClass</param-name>
-			<param-value>com.heyuo.QyWeiXinConfig</param-value>
+			<param-value>com.heyuo.qy.QyWeiXinConfig</param-value>
 		</init-param>
 	</filter>
 	

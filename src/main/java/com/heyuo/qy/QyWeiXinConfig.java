@@ -1,7 +1,9 @@
-package com.heyuo;
+package com.heyuo.qy;
 
-import com.heyuo.controller.QyConsultController;
-import com.heyuo.controller.QyKfController;
+import com.heyuo.qy.controller.IndexController;
+import com.heyuo.qy.controller.QyConsultController;
+import com.heyuo.qy.controller.QyKfController;
+import com.heyuo.qy.model._MappingKit;
 import com.jfinal.config.Constants;
 import com.jfinal.config.Handlers;
 import com.jfinal.config.Interceptors;
@@ -10,6 +12,8 @@ import com.jfinal.config.Plugins;
 import com.jfinal.config.Routes;
 import com.jfinal.core.JFinal;
 import com.jfinal.kit.PropKit;
+import com.jfinal.plugin.activerecord.ActiveRecordPlugin;
+import com.jfinal.plugin.c3p0.C3p0Plugin;
 import com.jfinal.qy.weixin.sdk.api.ApiConfigKit;
 import com.jfinal.render.ViewType;
 
@@ -44,6 +48,7 @@ public class QyWeiXinConfig extends JFinalConfig{
 	 * 配置路由
 	 */
 	public void configRoute(Routes me) {
+		me.add("/", IndexController.class);
 		me.add("/qy/consult", QyConsultController.class);
 		me.add("/qy/kf", QyKfController.class);
 	}
@@ -52,14 +57,14 @@ public class QyWeiXinConfig extends JFinalConfig{
 	 * 配置插件
 	 */
 	public void configPlugin(Plugins me) {
-//		// 配置C3p0数据库连接池插件
-//		C3p0Plugin c3p0Plugin = new C3p0Plugin(PropKit.get("jdbcUrl"), PropKit.get("user"), PropKit.get("password").trim());
-//		me.add(c3p0Plugin);
-//		
-//		// 配置ActiveRecord插件
-//		ActiveRecordPlugin arp = new ActiveRecordPlugin(c3p0Plugin);
-//		me.add(arp);
-//		arp.addMapping("blog", Blog.class);	// 映射blog 表到 Blog模型
+		// 配置C3p0数据库连接池插件
+		C3p0Plugin c3p0Plugin = new C3p0Plugin(PropKit.get("jdbcUrl"), PropKit.get("user"), PropKit.get("password").trim());
+		me.add(c3p0Plugin);
+
+		// 配置ActiveRecord插件
+		ActiveRecordPlugin arp = new ActiveRecordPlugin(c3p0Plugin);
+		me.add(arp);
+		_MappingKit.mapping(arp);
 	}
 	
 	/**
