@@ -77,20 +77,17 @@ public class KfInMsgParser {
 			KfInBaseMsg t = null;
 			if ("text".equals(msgType)) {
 				t = new KfInTextMsg();
-				String content = e.elementText("Content");
-
-				((KfInTextMsg)t).setContent(content);
+				((KfInTextMsg)t).setContent(e.elementText("Content"));
 			} else if ("image".equals(msgType)) {
 				t = new KfInImageMsg();
-				String picUrl = e.elementText("PicUrl");
-				String mediaId = e.elementText("MediaId");
-
-				((KfInImageMsg)t).setPicUrl(picUrl);
-				((KfInImageMsg)t).setMediaId(mediaId);
-			} else if ("file".equals(msgType) || "voice".equals(msgType)) {
+				((KfInImageMsg)t).setPicUrl(e.elementText("PicUrl"));
+				((KfInImageMsg)t).setMediaId(e.elementText("MediaId"));
+			} else if ("file".equals(msgType)) {
 				t = new KfInFileMsg();
-				String mediaId = e.elementText("MediaId");
-				((KfInFileMsg)t).setMediaId(mediaId);
+				((KfInFileMsg)t).setMediaId(e.elementText("MediaId"));
+			} else if ("voice".equals(msgType)) {
+				t = new KfInVoiceMsg();
+				((KfInVoiceMsg)t).setMediaId(e.elementText("MediaId"));
 			}
 
 			t.setFromUserName(fromUserName);
