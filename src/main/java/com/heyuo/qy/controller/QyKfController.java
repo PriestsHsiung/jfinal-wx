@@ -1,6 +1,7 @@
 
 package com.heyuo.qy.controller;
 
+import com.heyuo.qy.QyWeiXinConfig;
 import com.jfinal.kit.PropKit;
 import com.jfinal.log.Log;
 import com.jfinal.qy.weixin.sdk.api.*;
@@ -244,6 +245,8 @@ public class QyKfController extends MsgController {
 
 		ApiResult result = SendMessageApi.sendTextMsg(msg);
 		logger.error(result.getJson());
+
+		QyWeiXinConfig.eventBus.post(inTextMsg);
 	}
 
 	protected void processKfInImageMsg(KfInImageMsg inImageMsg) {
@@ -258,6 +261,8 @@ public class QyKfController extends MsgController {
 
 		ApiResult result = SendMessageApi.sendImageMsg(msg);
 		logger.error(result.getJson());
+
+		QyWeiXinConfig.eventBus.post(inImageMsg);
 	}
 
 	protected void processKfInVoiceMsg(KfInVoiceMsg inVoiceMsg) {
@@ -272,6 +277,8 @@ public class QyKfController extends MsgController {
 
 		ApiResult result = SendMessageApi.sendVoiceMsg(msg);
 		logger.error(result.getJson());
+
+		QyWeiXinConfig.eventBus.post(inVoiceMsg);
 	}
 
 	protected void processKfInFileMsg(KfInFileMsg inFileMsg) {
@@ -286,6 +293,8 @@ public class QyKfController extends MsgController {
 
 		ApiResult result = SendMessageApi.sendFileMsg(msg);
 		logger.error(result.getJson());
+
+		QyWeiXinConfig.eventBus.post(inFileMsg);
 	}
 
 

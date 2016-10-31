@@ -1,8 +1,11 @@
 package com.heyuo.qy;
 
+import com.google.common.eventbus.AsyncEventBus;
 import com.heyuo.qy.controller.IndexController;
 import com.heyuo.qy.controller.QyConsultController;
 import com.heyuo.qy.controller.QyKfController;
+import com.heyuo.qy.event.ClientConsultEventHandler;
+import com.heyuo.qy.event.CustomerServiceAgentEventHandler;
 import com.heyuo.qy.model._MappingKit;
 import com.jfinal.config.Constants;
 import com.jfinal.config.Handlers;
@@ -17,7 +20,18 @@ import com.jfinal.plugin.c3p0.C3p0Plugin;
 import com.jfinal.qy.weixin.sdk.api.ApiConfigKit;
 import com.jfinal.render.ViewType;
 
+import java.util.concurrent.Executors;
+
 public class QyWeiXinConfig extends JFinalConfig{
+
+	public static final AsyncEventBus eventBus;
+
+	static {
+		eventBus = new AsyncEventBus(Executors.newFixedThreadPool(1));
+		eventBus.register(new ClientConsultEventHandler());
+		eventBus.register(new CustomerServiceAgentEventHandler());
+	}
+
 	/**
 	 * 如果生产环境配置文件存在，则优先加载该配置，否则加载开发环境配置文件
 	 * @param pro 生产环境配置文件

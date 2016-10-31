@@ -2,6 +2,8 @@
 package com.heyuo.qy.controller;
 
 import com.alibaba.fastjson.JSONArray;
+import com.heyuo.qy.QyWeiXinConfig;
+import com.heyuo.qy.event.ClientConsultEvent;
 import com.heyuo.qy.model.QyLevel;
 import com.heyuo.qy.service.QyLevelService;
 import com.jfinal.kit.JsonKit;
@@ -101,34 +103,36 @@ public class QyConsultController extends MsgController {
 
 	@Override
 	protected void processInTextMsg(InTextMsg inTextMsg) {
-		if (!qyLevelService.canSendText(inTextMsg.getFromUserName())) {
-			renderPermissionMsg(inTextMsg);
-			return;
-		}
-
 		String kf = getKf(inTextMsg);
 		if (StringUtils.isBlank(kf)) {
 			return;
 		}
 
-		KfTextMsg kfTextMsg = new KfTextMsg();
-		kfTextMsg.getSender().setType("userid");
-		kfTextMsg.getSender().setId(inTextMsg.getFromUserName());
-		kfTextMsg.getReceiver().setType("kf");
-		kfTextMsg.getReceiver().setId(kf);
-		kfTextMsg.getText().setContent(inTextMsg.getContent());
-		ApiResult result = KfApi.sendMsg(JsonKit.toJson(kfTextMsg).toString());
-		System.out.println(result.getJson());
-//		List in
-//		getList("internal");
-//		if (internalKf.isEmpty()) {
-//			OutTextMsg outMsg = new OutTextMsg(inTextMsg);
-//			outMsg.setContent("客服人员正忙，请稍候再试");
-//			render(outMsg);
-//		}
-//		StringinternalKf.get(0);
-		String msgContent = inTextMsg.getContent().trim();
-		System.out.println("收到的信息："+msgContent);
+		Boolean canSend = qyLevelService.canSendText(inTextMsg.getFromUserName());
+		if (!canSend) {
+			renderPermissionMsg(inTextMsg);
+		}
+
+		ClientConsultEvent event = new ClientConsultEvent();
+		event.setForbidden(!canSend);
+		event.setCustomerServiceAgentId(kf);
+		event.setMsg(inTextMsg);
+		QyWeiXinConfig.eventBus.post(event);
+
+		if (canSend) {
+			KfTextMsg kfTextMsg = new KfTextMsg();
+			kfTextMsg.getSender().setType("userid");
+			kfTextMsg.getSender().setId(inTextMsg.getFromUserName());
+			kfTextMsg.getReceiver().setType("kf");
+			kfTextMsg.getReceiver().setId(kf);
+			kfTextMsg.getText().setContent(inTextMsg.getContent());
+			ApiResult result = KfApi.sendMsg(JsonKit.toJson(kfTextMsg).toString());
+			System.out.println(result.getJson());
+
+
+			String msgContent = inTextMsg.getContent().trim();
+			System.out.println("收到的信息：" + msgContent);
+		}
 	}
 
 	/**
@@ -136,48 +140,64 @@ public class QyConsultController extends MsgController {
 	 */
 	@Override
 	protected void processInImageMsg(InImageMsg inImageMsg) {
-		if (!qyLevelService.canSendImage(inImageMsg.getFromUserName())) {
-			renderPermissionMsg(inImageMsg);
-			return;
-		}
-
 		String kf = getKf(inImageMsg);
 		if (StringUtils.isBlank(kf)) {
 			return;
 		}
 
-		KfImageMsg kfImageMsg = new KfImageMsg();
-		kfImageMsg.getSender().setType("userid");
-		kfImageMsg.getSender().setId(inImageMsg.getFromUserName());
-		kfImageMsg.getReceiver().setType("kf");
-		kfImageMsg.getReceiver().setId(kf);
-		kfImageMsg.getImage().setMedia_id(inImageMsg.getMediaId());
-		ApiResult result = KfApi.sendMsg(JsonKit.toJson(kfImageMsg).toString());
-		System.out.println(result.getJson());
+		Boolean canSend = qyLevelService.canSendImage(inImageMsg.getFromUserName());
+		if (!canSend) {
+			renderPermissionMsg(inImageMsg);
+		}
+
+		ClientConsultEvent event = new ClientConsultEvent();
+		event.setForbidden(!canSend);
+		event.setCustomerServiceAgentId(kf);
+		event.setMsg(inImageMsg);
+		QyWeiXinConfig.eventBus.post(event);
+
+		if (canSend) {
+			KfImageMsg kfImageMsg = new KfImageMsg();
+			kfImageMsg.getSender().setType("userid");
+			kfImageMsg.getSender().setId(inImageMsg.getFromUserName());
+			kfImageMsg.getReceiver().setType("kf");
+			kfImageMsg.getReceiver().setId(kf);
+			kfImageMsg.getImage().setMedia_id(inImageMsg.getMediaId());
+			ApiResult result = KfApi.sendMsg(JsonKit.toJson(kfImageMsg).toString());
+			System.out.println(result.getJson());
+		}
 	}
 
 	/**
 	 * 实现父类抽方法，处理语音消息
 	 */
 	protected void processInVoiceMsg(InVoiceMsg inVoiceMsg) {
-		if (!qyLevelService.canSendVoice(inVoiceMsg.getFromUserName())) {
-			renderPermissionMsg(inVoiceMsg);
-			return;
-		}
-
 		String kf = getKf(inVoiceMsg);
 		if (StringUtils.isBlank(kf)) {
 			return;
 		}
 
-		KfVoiceMsg kfImageMsg = new KfVoiceMsg();
-		kfImageMsg.getSender().setType("userid");
-		kfImageMsg.getSender().setId(inVoiceMsg.getFromUserName());
-		kfImageMsg.getReceiver().setType("kf");
-		kfImageMsg.getReceiver().setId(kf);
-		kfImageMsg.getVoice().setMedia_id(inVoiceMsg.getMediaId());
-		ApiResult result = KfApi.sendMsg(JsonKit.toJson(kfImageMsg).toString());
-		System.out.println(result.getJson());
+		Boolean canSend = qyLevelService.canSendVoice(inVoiceMsg.getFromUserName());
+		if (!canSend) {
+			renderPermissionMsg(inVoiceMsg);
+		}
+
+		ClientConsultEvent event = new ClientConsultEvent();
+		event.setForbidden(!canSend);
+		event.setCustomerServiceAgentId(kf);
+		event.setMsg(inVoiceMsg);
+		QyWeiXinConfig.eventBus.post(event);
+
+		if (canSend) {
+			KfVoiceMsg kfImageMsg = new KfVoiceMsg();
+			kfImageMsg.getSender().setType("userid");
+			kfImageMsg.getSender().setId(inVoiceMsg.getFromUserName());
+			kfImageMsg.getReceiver().setType("kf");
+			kfImageMsg.getReceiver().setId(kf);
+			kfImageMsg.getVoice().setMedia_id(inVoiceMsg.getMediaId());
+			ApiResult result = KfApi.sendMsg(JsonKit.toJson(kfImageMsg).toString());
+			System.out.println(result.getJson());
+		}
 	}
 
 	/**
