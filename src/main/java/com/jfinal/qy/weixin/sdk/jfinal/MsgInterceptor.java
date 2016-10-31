@@ -108,8 +108,10 @@ public class MsgInterceptor implements Interceptor {
 		String signature = c.getPara("msg_signature");
 		String timestamp = c.getPara("timestamp");
 		String nonce = c.getPara("nonce");
-		
-		c.renderText(SignatureCheckKit.me.VerifyURL(signature, timestamp, nonce, echostr));
+
+		String tmp = SignatureCheckKit.me.VerifyURL(signature, timestamp, nonce, echostr);
+		log.info("receive echostr:" + tmp);
+		c.renderText(tmp);
 			
 	}
 	

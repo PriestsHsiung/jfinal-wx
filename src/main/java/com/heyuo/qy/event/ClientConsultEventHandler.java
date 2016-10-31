@@ -36,7 +36,7 @@ public class ClientConsultEventHandler {
         InTextMsg inTextMsg = (InTextMsg)textMsgEvent.getMsg();
         String clientServiceAgentId = textMsgEvent.getCustomerServiceAgentId();
         Boolean forbidden = textMsgEvent.getForbidden();
-        Boolean sended = false;
+        Boolean sended = true;
 
 //        if (!forbidden) {
 //            KfTextMsg kfTextMsg = new KfTextMsg();
@@ -61,7 +61,7 @@ public class ClientConsultEventHandler {
         InImageMsg inImageMsg = (InImageMsg)imageMsgEvent.getMsg();
         String clientServiceAgentId = imageMsgEvent.getCustomerServiceAgentId();
         Boolean forbidden = imageMsgEvent.getForbidden();
-        Boolean sended = false;
+        Boolean sended = true;
 
 //        if (!forbidden) {
 //            KfImageMsg kfImageMsg = new KfImageMsg();
@@ -84,7 +84,7 @@ public class ClientConsultEventHandler {
         InVoiceMsg inVoiceMsg = (InVoiceMsg)voiceMsgEvent.getMsg();
         String clientServiceAgentId = voiceMsgEvent.getCustomerServiceAgentId();
         Boolean forbidden = voiceMsgEvent.getForbidden();
-        Boolean sended = false;
+        Boolean sended = true;
 //
 //        if (!forbidden) {
 //            KfVoiceMsg kfImageMsg = new KfVoiceMsg();

@@ -49,7 +49,7 @@ public class CustomerServiceAgentEventHandler {
 //        LOGGER.info(result.getJson());
 
         archiveService.archive(inImageMsg.getFromUserName(), inImageMsg.getReceiver().getId(),
-                "image",  inImageMsg.getMsgId(), inImageMsg.getMediaId(), false, true);
+                "image",  inImageMsg.getMsgId(), inImageMsg.getPicUrl(), false, true);
     }
 
     @Subscribe
