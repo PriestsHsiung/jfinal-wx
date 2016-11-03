@@ -57,14 +57,6 @@ public abstract class BaseConsultRecords<M extends BaseConsultRecords<M>> extend
 		return get("content");
 	}
 
-	public void setCrawl(java.lang.Boolean crawl) {
-		set("crawl", crawl);
-	}
-
-	public java.lang.Boolean getCrawl() {
-		return get("crawl");
-	}
-
 	public void setForbidden(java.lang.Boolean forbidden) {
 		set("forbidden", forbidden);
 	}
@@ -87,6 +79,22 @@ public abstract class BaseConsultRecords<M extends BaseConsultRecords<M>> extend
 
 	public java.lang.String getMsgId() {
 		return get("msg_id");
+	}
+
+	public void setCrawl(java.lang.Boolean crawl) {
+		set("crawl", crawl);
+	}
+
+	public java.lang.Boolean getCrawl() {
+		return get("crawl");
+	}
+
+	public void setCrawlErrorMsg(java.lang.String crawlErrorMsg) {
+		set("crawl_error_msg", crawlErrorMsg);
+	}
+
+	public java.lang.String getCrawlErrorMsg() {
+		return get("crawl_error_msg");
 	}
 
 }

@@ -138,8 +138,8 @@
 		<dependency>
 			<groupId>com.google.code.gson</groupId>
 			<artifactId>gson</artifactId>
-			<version>2.4</version>
-			<scope>provided</scope>
+			<version>2.6.2</version>
+			<!--<scope>provided</scope>-->
 		</dependency>
 		<!-- 上传组件包 -->
 		<dependency>
@@ -175,11 +175,16 @@
 			<version>1.4.8</version>
 		</dependency>
 		<dependency>
-			<groupId>redis.clients</groupId>
-			<artifactId>jedis</artifactId>
-			<version>2.7.2</version>
-			<scope>provided</scope>
+			<groupId>org.quartz-scheduler</groupId>
+			<artifactId>quartz</artifactId>
+			<version>2.2.1</version>
 		</dependency>
+		<!--<dependency>-->
+			<!--<groupId>redis.clients</groupId>-->
+			<!--<artifactId>jedis</artifactId>-->
+			<!--<version>2.7.2</version>-->
+			<!--<scope>provided</scope>-->
+		<!--</dependency>-->
 		<dependency>
 			<groupId>de.ruedigermoeller</groupId>
 			<artifactId>fst</artifactId>
@@ -190,10 +195,18 @@
 			<groupId>com.squareup.okhttp</groupId>
 			<artifactId>okhttp</artifactId>
 			<version>2.6.0</version>
-			<scope>provided</scope>
+			<!--<scope>provided</scope>-->
 		</dependency>
-
-
+		<dependency>
+			<groupId>com.squareup.retrofit2</groupId>
+			<artifactId>retrofit</artifactId>
+			<version>2.1.0</version>
+		</dependency>
+		<dependency>
+			<groupId>com.squareup.retrofit2</groupId>
+			<artifactId>converter-gson</artifactId>
+			<version>2.1.0</version>
+		</dependency>
 	</dependencies>
 	<build>
 		<finalName>qywx</finalName>

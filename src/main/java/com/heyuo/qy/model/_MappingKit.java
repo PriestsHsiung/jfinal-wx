@@ -17,6 +17,7 @@ public class _MappingKit {
 
 	public static void mapping(ActiveRecordPlugin arp) {
 		arp.addMapping("consult_records", "id", ConsultRecords.class);
+		arp.addMapping("msg_media", "id", MsgMedia.class);
 		arp.addMapping("qy_level", "wx_user", QyLevel.class);
 	}
 }

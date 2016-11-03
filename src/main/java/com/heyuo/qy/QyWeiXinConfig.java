@@ -19,7 +19,12 @@ import com.jfinal.plugin.activerecord.ActiveRecordPlugin;
 import com.jfinal.plugin.c3p0.C3p0Plugin;
 import com.jfinal.qy.weixin.sdk.api.ApiConfigKit;
 import com.jfinal.render.ViewType;
+import com.xiongl.weixin.service.DownloadJob;
+import com.xiongl.weixin.service.JobService;
+import org.quartz.SchedulerException;
 
+import java.text.ParseException;
+import java.util.Calendar;
 import java.util.concurrent.Executors;
 
 public class QyWeiXinConfig extends JFinalConfig{
@@ -44,6 +49,14 @@ public class QyWeiXinConfig extends JFinalConfig{
 		catch (Exception e) {
 			PropKit.use(dev);
 		}
+
+		try {
+			JobService.addJob("downloadFile", "g1", "trigger1", "g1", DownloadJob.class, "0 0 1 * * ?");
+		} catch (SchedulerException e) {
+			e.printStackTrace();
+		} catch (ParseException e) {
+			e.printStackTrace();
+		}
 	}
 	/**
 	 * 配置常量
@@ -56,6 +69,7 @@ public class QyWeiXinConfig extends JFinalConfig{
 		me.setViewType(ViewType.JSP);
 		// ApiConfigKit 设为开发模式可以在开发阶段输出请求交互的 xml 与 json 数据
 		ApiConfigKit.setDevMode(me.getDevMode());
+
 	}
 	
 	/**
