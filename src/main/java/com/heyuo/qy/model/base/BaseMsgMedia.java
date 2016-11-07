@@ -9,14 +9,6 @@ import com.jfinal.plugin.activerecord.IBean;
 @SuppressWarnings("serial")
 public abstract class BaseMsgMedia<M extends BaseMsgMedia<M>> extends Model<M> implements IBean {
 
-	public void setId(java.lang.Integer id) {
-		set("id", id);
-	}
-
-	public java.lang.Integer getId() {
-		return get("id");
-	}
-
 	public void setMsgId(java.lang.String msgId) {
 		set("msg_id", msgId);
 	}

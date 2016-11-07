@@ -3,16 +3,12 @@ package com.heyuo.qy;
 import com.google.common.eventbus.AsyncEventBus;
 import com.heyuo.qy.controller.IndexController;
 import com.heyuo.qy.controller.QyConsultController;
+import com.heyuo.qy.controller.QyConsultRecordApiController;
 import com.heyuo.qy.controller.QyKfController;
 import com.heyuo.qy.event.ClientConsultEventHandler;
 import com.heyuo.qy.event.CustomerServiceAgentEventHandler;
 import com.heyuo.qy.model._MappingKit;
-import com.jfinal.config.Constants;
-import com.jfinal.config.Handlers;
-import com.jfinal.config.Interceptors;
-import com.jfinal.config.JFinalConfig;
-import com.jfinal.config.Plugins;
-import com.jfinal.config.Routes;
+import com.jfinal.config.*;
 import com.jfinal.core.JFinal;
 import com.jfinal.kit.PropKit;
 import com.jfinal.plugin.activerecord.ActiveRecordPlugin;
@@ -24,7 +20,6 @@ import com.xiongl.weixin.service.JobService;
 import org.quartz.SchedulerException;
 
 import java.text.ParseException;
-import java.util.Calendar;
 import java.util.concurrent.Executors;
 
 public class QyWeiXinConfig extends JFinalConfig{
@@ -79,6 +74,7 @@ public class QyWeiXinConfig extends JFinalConfig{
 		me.add("/", IndexController.class);
 		me.add("/qy/consult", QyConsultController.class);
 		me.add("/qy/kf", QyKfController.class);
+		me.add("/qy/record/list", QyConsultRecordApiController.class);
 	}
 	
 	/**

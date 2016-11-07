@@ -97,4 +97,12 @@ public abstract class BaseConsultRecords<M extends BaseConsultRecords<M>> extend
 		return get("crawl_error_msg");
 	}
 
+	public void setFromUserKf(java.lang.Boolean fromUserKf) {
+		set("from_user_kf", fromUserKf);
+	}
+
+	public java.lang.Boolean getFromUserKf() {
+		return get("from_user_kf");
+	}
+
 }
