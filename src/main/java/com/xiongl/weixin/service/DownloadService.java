@@ -67,12 +67,13 @@ public class DownloadService {
                         mediaFile.setContentType(body.contentType().toString());
                         mediaFile.setFileStream(body.byteStream());
 
-                        String path = currentPath(mediaFile);
-                        Boolean res = writeResponseBodyToDisk(path, mediaFile);
+                        String[] paths = currentPath(mediaFile);
+                        Boolean res = writeResponseBodyToDisk(paths[0], mediaFile);
                         if (res) {
                             MsgMedia mm = new MsgMedia();
                             mm.setMsgId(msgId);
-                            mm.setFilePath(path);
+                            mm.setFilePath(paths[0]);
+                            mm.setUrlPath(paths[1]);
                             mm.save();
                             updateCrawlStatus(msgId, "");
                         }
@@ -91,18 +92,24 @@ public class DownloadService {
         return true;
     }
 
-    private String currentPath(MediaFile file) {
+    private String[] currentPath(MediaFile file) {
+        String[] paths = new String[2];
+
         SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
         String date = sdf.format(new Date());
 
         String folder = PATH + date + "/";
+        String virFolder = "/upload_file" + date + "/";
         File dir = new File(folder);
         if (!dir.exists()) {
             dir.mkdir();
         }
 
         String fileName = System.currentTimeMillis() + "." + file.getContentType();
-        return  folder + fileName;
+
+        paths[0] = folder + fileName;
+        paths[1] = virFolder + fileName;
+        return paths;
     }
 
     private void updateCrawlStatus(String msgId, String errMsg) {
