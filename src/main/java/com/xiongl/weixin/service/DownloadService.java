@@ -1,15 +1,15 @@
 package com.xiongl.weixin.service;
 
 import com.google.gson.Gson;
-
 import com.heyuo.qy.model.ConsultRecords;
 import com.heyuo.qy.model.MsgMedia;
+import com.jfinal.kit.PropKit;
 import com.xiongl.weixin.sdk.Constant;
 import com.xiongl.weixin.sdk.ErrorResult;
+import com.xiongl.weixin.sdk.MediaApi;
 import com.xiongl.weixin.sdk.MediaFile;
 import okhttp3.MediaType;
 import okhttp3.ResponseBody;
-import com.xiongl.weixin.sdk.MediaApi;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import retrofit2.Call;
@@ -24,11 +24,13 @@ import java.util.Date;
  * Created by Administrator on 2016-11-2.
  */
 public class DownloadService {
-    private static final String PATH = "D:/qywx/";
+    private String path;
     private static MediaApi mediaApi = RetrofitService.getInstance(false).create(MediaApi.class);
     private static final Logger LOGGER = LoggerFactory.getLogger(MediaApi.class);
 
     public boolean download(final String type, final String msgId, final String content) {
+        path = PropKit.get("downloadPath");
+
         Call<ResponseBody> call;
         if ("image".equals(type)) {
             call = mediaApi.getImageFile(content);
@@ -98,7 +100,7 @@ public class DownloadService {
         SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
         String date = sdf.format(new Date());
 
-        String folder = PATH + date + "/";
+        String folder = path + date + "/";
         String virFolder = "/upload_file" + date + "/";
         File dir = new File(folder);
         if (!dir.exists()) {
