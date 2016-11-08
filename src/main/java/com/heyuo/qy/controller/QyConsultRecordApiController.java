@@ -7,6 +7,8 @@ import com.jfinal.core.Controller;
 import com.jfinal.kit.PropKit;
 import com.jfinal.log.Log;
 
+import java.util.Date;
+
 /**
  * Created by Administrator on 2016-11-7.
  */
@@ -23,9 +25,12 @@ public class QyConsultRecordApiController extends Controller {
             return;
         }
 
+        String qyName = getPara("qy");
+        Date beg = getParaToDate("beg");
+        Date end = getParaToDate("end");
         Integer pageNo = Integer.valueOf(getPara("pageNo", "1"));
         Integer pageSize = Integer.valueOf(getPara("pageSize", "10"));
-        PageInfo<QyConsultRecord> qycrPage = qycrService.getRecords(pageNo, pageSize);
+        PageInfo<QyConsultRecord> qycrPage = qycrService.getRecords(qyName, beg, end, pageNo, pageSize);
         renderJson(qycrPage);
     }
 }

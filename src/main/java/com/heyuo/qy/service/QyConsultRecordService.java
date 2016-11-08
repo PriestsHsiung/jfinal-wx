@@ -6,7 +6,11 @@ import com.heyuo.qy.model.ConsultRecords;
 import com.heyuo.qy.model.MsgMedia;
 import com.heyuo.qy.model.QyLevel;
 import com.jfinal.plugin.activerecord.Page;
+import org.apache.commons.lang.StringUtils;
 
+import java.text.SimpleDateFormat;
+import java.util.Calendar;
+import java.util.Date;
 import java.util.LinkedList;
 import java.util.List;
 
@@ -14,9 +18,66 @@ import java.util.List;
  * Created by Administrator on 2016-11-7.
  */
 public class QyConsultRecordService {
-    public PageInfo<QyConsultRecord> getRecords(Integer pageNum, Integer pageSize) {
+    private String concateIn(List<QyLevel> qyLevelList) {
+        StringBuilder sb = new StringBuilder();
+        for (QyLevel qyLevel : qyLevelList) {
+            sb.append(qyLevel.getWxUser()).append(",");
+        }
+        sb.deleteCharAt(sb.length() - 1);
+
+        return sb.toString();
+    }
+
+    public PageInfo<QyConsultRecord> getRecords(String qyName, Date beg, Date end,
+                                                Integer pageNum, Integer pageSize) {
+        StringBuilder sb = new StringBuilder();
+        if (StringUtils.isNotBlank(qyName)) {
+            List<QyLevel> qyLevelList = QyLevel.dao.find("select * from qy_level where qy like " + "\"%" + qyName + "\"");
+            if (!qyLevelList.isEmpty()) {
+                sb.append("(");
+
+                sb.append("from_user in (\"");
+                sb.append(concateIn(qyLevelList)).append("\")");
+
+                sb.append(" or ");
+
+                sb.append("to_user in (\"");
+                sb.append(concateIn(qyLevelList)).append("\")");
+
+                sb.append(")");
+            }
+        }
+
+        if (null != beg || null != end) {
+            if (sb.length() > 0) {
+                sb.append(" and ");
+            }
+
+            SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
+            if (null != beg) {
+                sb.append(" date >='").append(sdf.format(beg)).append("'");
+            }
+
+            if (null != end) {
+                if (null != beg) {
+                    sb.append(" and ");
+                }
+                Calendar c = Calendar.getInstance();
+                c.setTime(end);
+                c.set(Calendar.DATE, c.get(Calendar.DATE) + 1);
+                end = c.getTime();
+                sb.append(" date <='").append(sdf.format(end)).append("'");
+            }
+        }
+
+        String sqlExpect = "from consult_records";
+        if (sb.length() > 0) {
+            sqlExpect += " where ";
+            sqlExpect += sb.toString();
+        }
+
         Page<ConsultRecords> crPage
-                = ConsultRecords.dao.paginate(pageNum, pageSize, "select * ", "from consult_records");
+                = ConsultRecords.dao.paginate(pageNum, pageSize, "select * ", sqlExpect);
 
         List<ConsultRecords> crList = crPage.getList();
         PageInfo<QyConsultRecord> qycrPage = new PageInfo<QyConsultRecord>();
