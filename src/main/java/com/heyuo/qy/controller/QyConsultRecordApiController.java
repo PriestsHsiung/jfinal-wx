@@ -28,7 +28,7 @@ public class QyConsultRecordApiController extends Controller {
         String qyName = getPara("qy");
         Date beg = getParaToDate("beg");
         Date end = getParaToDate("end");
-        Integer pageNo = Integer.valueOf(getPara("pageNo", "1"));
+        Integer pageNo = Integer.valueOf(getPara("pageNum", "1"));
         Integer pageSize = Integer.valueOf(getPara("pageSize", "10"));
         PageInfo<QyConsultRecord> qycrPage = qycrService.getRecords(qyName, beg, end, pageNo, pageSize);
         renderJson(qycrPage);
