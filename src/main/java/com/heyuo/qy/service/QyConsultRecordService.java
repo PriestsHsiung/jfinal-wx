@@ -9,10 +9,7 @@ import com.jfinal.plugin.activerecord.Page;
 import org.apache.commons.lang.StringUtils;
 
 import java.text.SimpleDateFormat;
-import java.util.Calendar;
-import java.util.Date;
-import java.util.LinkedList;
-import java.util.List;
+import java.util.*;
 
 /**
  * Created by Administrator on 2016-11-7.
@@ -21,7 +18,7 @@ public class QyConsultRecordService {
     private String concateIn(List<QyLevel> qyLevelList) {
         StringBuilder sb = new StringBuilder();
         for (QyLevel qyLevel : qyLevelList) {
-            sb.append(qyLevel.getWxUser()).append(",");
+            sb.append("\"").append(qyLevel.getWxUser()).append("\"").append(",");
         }
         sb.deleteCharAt(sb.length() - 1);
 
@@ -32,19 +29,27 @@ public class QyConsultRecordService {
                                                 Integer pageNum, Integer pageSize) {
         StringBuilder sb = new StringBuilder();
         if (StringUtils.isNotBlank(qyName)) {
-            List<QyLevel> qyLevelList = QyLevel.dao.find("select * from qy_level where qy like " + "\"%" + qyName + "\"");
+            List<QyLevel> qyLevelList = QyLevel.dao.find("select * from qy_level where qy like " + "\"%" + qyName + "%\"");
             if (!qyLevelList.isEmpty()) {
                 sb.append("(");
 
-                sb.append("from_user in (\"");
-                sb.append(concateIn(qyLevelList)).append("\")");
+                sb.append("from_user in (");
+                sb.append(concateIn(qyLevelList)).append(")");
 
                 sb.append(" or ");
 
-                sb.append("to_user in (\"");
-                sb.append(concateIn(qyLevelList)).append("\")");
+                sb.append("to_user in (");
+                sb.append(concateIn(qyLevelList)).append(")");
 
                 sb.append(")");
+            } else {
+                PageInfo<QyConsultRecord> p = new PageInfo<QyConsultRecord>();
+                p.setData(Collections.EMPTY_LIST);
+                p.setTotal(0);
+                p.setPageTotal(0);
+                p.setPageSize(pageSize);
+                p.setPageNum(pageNum);
+                return p;
             }
         }
 
