@@ -10,6 +10,7 @@ import com.xiongl.weixin.sdk.MediaApi;
 import com.xiongl.weixin.sdk.MediaFile;
 import okhttp3.MediaType;
 import okhttp3.ResponseBody;
+import org.apache.commons.lang.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import retrofit2.Call;
@@ -57,10 +58,15 @@ public class DownloadService {
                             updateCrawlStatus(msgId, er.getErrcode() + ":" + er.getErrmsg());
                         }
                     } else {
+                        String fullName = "";
+                        String relName = "";
+                        String suffix = "";
                         String ds = response.headers().get("Content-disposition");
-                        String fullName = ds.substring(ds.indexOf("filename=\"") + 10, ds.length() - 1);
-                        String relName = fullName.substring(0, fullName.lastIndexOf("."));
-                        String suffix = fullName.substring(relName.length() + 1);
+                        if (null != ds) {
+                            fullName = ds.substring(ds.indexOf("filename=\"") + 10, ds.length() - 1);
+                            relName = fullName.substring(0, fullName.lastIndexOf("."));
+                            suffix = fullName.substring(relName.length() + 1);
+                        }
 
                         mediaFile.setFullName(fullName);
                         mediaFile.setFileName(relName);
@@ -69,7 +75,16 @@ public class DownloadService {
                         mediaFile.setContentType(body.contentType().toString());
                         mediaFile.setFileStream(body.byteStream());
 
-                        String[] paths = currentPath(mediaFile);
+                        if (StringUtils.isBlank(mediaFile.getSuffix())) {
+                            String contentType = mediaFile.getContentType();
+                            Integer idx = contentType.indexOf("/");
+                            if (-1 != idx) {
+                                suffix = contentType.substring(idx + 1, contentType.length());
+                                mediaFile.setSuffix(suffix);
+                            }
+                        }
+
+                        String[] paths = currentFile(mediaFile);
                         Boolean res = writeResponseBodyToDisk(paths[0], mediaFile);
                         if (res) {
                             MsgMedia mm = new MsgMedia();
@@ -94,20 +109,21 @@ public class DownloadService {
         return true;
     }
 
-    private String[] currentPath(MediaFile file) {
+    private String[] currentFile(MediaFile file) {
         String[] paths = new String[2];
 
         SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
         String date = sdf.format(new Date());
 
-        String folder = path + date + "/";
-        String virFolder = "/upload_file" + date + "/";
-        File dir = new File(folder);
-        if (!dir.exists()) {
-            dir.mkdir();
-        }
+        String folder = path + "qywx" + "/";
+        String virFolder = "/upload_file/" + "qywx" + "/";
+        String fileName = System.currentTimeMillis() + "." + file.getSuffix();
 
-        String fileName = System.currentTimeMillis() + "." + file.getContentType();
+        File dir = new File(folder);
+        if (!dir.exists() && !dir.mkdirs()) {
+            LOGGER.error("创建文件" + dir.getName() + "失败,");
+            return paths;
+        }
 
         paths[0] = folder + fileName;
         paths[1] = virFolder + fileName;
@@ -126,10 +142,12 @@ public class DownloadService {
     private boolean writeResponseBodyToDisk(String path, MediaFile file) {
         try {
             File futureStudioIconFile = new File(path);
+            if (!futureStudioIconFile.exists()) {
+                futureStudioIconFile.createNewFile();
+            }
 
             InputStream inputStream = null;
             OutputStream outputStream = null;
-
 
             try {
                 byte[] fileReader = new byte[4096];

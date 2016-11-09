@@ -1,12 +1,13 @@
 package com.xiongl.weixin.service;
 
 import com.heyuo.qy.model.ConsultRecords;
+import org.quartz.Job;
+import org.quartz.JobExecutionContext;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.util.Calendar;
 import java.util.List;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.quartz.*;
 
 /**
  * Created by Administrator on 2016-11-3.
@@ -21,8 +22,8 @@ public class DownloadJob implements Job {
             LOGGER.info("定时下载任务启动...");
             List<ConsultRecords> crList =
                     ConsultRecords.dao.find("select * from consult_records" +
-                            "where crawl = 0 and (type = 'image' or type = 'voice' or type = 'file')" +
-                            "order by date desc");
+                            " where crawl = 0 and (type = 'image' or type = 'voice' or type = 'file')" +
+                            " order by date desc");
 
             DownloadService ds = new DownloadService();
             Integer count = 0;

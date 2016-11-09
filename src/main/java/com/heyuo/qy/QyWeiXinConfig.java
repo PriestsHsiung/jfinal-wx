@@ -15,6 +15,9 @@ import com.jfinal.plugin.activerecord.ActiveRecordPlugin;
 import com.jfinal.plugin.c3p0.C3p0Plugin;
 import com.jfinal.qy.weixin.sdk.api.ApiConfigKit;
 import com.jfinal.render.ViewType;
+import com.xiongl.weixin.sdk.ApiConfig;
+import com.xiongl.weixin.sdk.Constant;
+import com.xiongl.weixin.service.AccessTokenService;
 import com.xiongl.weixin.service.DownloadJob;
 import com.xiongl.weixin.service.JobService;
 import org.quartz.SchedulerException;
@@ -44,14 +47,6 @@ public class QyWeiXinConfig extends JFinalConfig{
 		catch (Exception e) {
 			PropKit.use(dev);
 		}
-
-		try {
-			JobService.addJob("downloadFile", "g1", "trigger1", "g1", DownloadJob.class, "0 0 1 * * ?");
-		} catch (SchedulerException e) {
-			e.printStackTrace();
-		} catch (ParseException e) {
-			e.printStackTrace();
-		}
 	}
 	/**
 	 * 配置常量
@@ -65,6 +60,11 @@ public class QyWeiXinConfig extends JFinalConfig{
 		// ApiConfigKit 设为开发模式可以在开发阶段输出请求交互的 xml 与 json 数据
 		ApiConfigKit.setDevMode(me.getDevMode());
 
+		ApiConfig ac = new ApiConfig();
+		ac.setToken(PropKit.get("token"));
+		ac.setCorpId(PropKit.get("corpId"));
+		ac.setCorpSecret(PropKit.get("yy_secret"));
+		AccessTokenService.configMap.put(Constant.CONSULT_APP, ac);
 	}
 	
 	/**
@@ -90,7 +90,17 @@ public class QyWeiXinConfig extends JFinalConfig{
 		me.add(arp);
 		_MappingKit.mapping(arp);
 	}
-	
+
+	public void afterJFinalStart() {
+		try {
+			JobService.addJob("downloadFile", "g1", "trigger1", "g1", DownloadJob.class, "0 0 1 * * ?");
+		} catch (SchedulerException e) {
+			e.printStackTrace();
+		} catch (ParseException e) {
+			e.printStackTrace();
+		}
+	}
+
 	/**
 	 * 配置全局拦截器
 	 */
