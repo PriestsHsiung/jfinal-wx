@@ -3,10 +3,10 @@ package com.heyuo.qy.event;
 import com.google.common.eventbus.Subscribe;
 import com.heyuo.qy.service.ArchiveService;
 import com.jfinal.log.Log;
-import com.jfinal.qy.weixin.sdk.api.ApiResult;
-import com.jfinal.qy.weixin.sdk.api.SendMessageApi;
-import com.jfinal.qy.weixin.sdk.msg.kf.in.*;
-import com.jfinal.qy.weixin.sdk.msg.send.*;
+import com.jfinal.qy.weixin.sdk.msg.kf.in.KfInFileMsg;
+import com.jfinal.qy.weixin.sdk.msg.kf.in.KfInImageMsg;
+import com.jfinal.qy.weixin.sdk.msg.kf.in.KfInTextMsg;
+import com.jfinal.qy.weixin.sdk.msg.kf.in.KfInVoiceMsg;
 
 /**
  * Created by Administrator on 2016-10-31.
@@ -31,7 +31,7 @@ public class CustomerServiceAgentEventHandler {
 //        LOGGER.info(result.getJson());
 
         archiveService.archive(inTextMsg.getFromUserName(), inTextMsg.getReceiver().getId(),
-                "text",  inTextMsg.getMsgId(), inTextMsg.getContent(), false, true);
+                "text",  inTextMsg.getMsgId(), inTextMsg.getContent(), false, true, true);
     }
 
     @Subscribe
@@ -49,7 +49,7 @@ public class CustomerServiceAgentEventHandler {
 //        LOGGER.info(result.getJson());
 
         archiveService.archive(inImageMsg.getFromUserName(), inImageMsg.getReceiver().getId(),
-                "image",  inImageMsg.getMsgId(), inImageMsg.getPicUrl(), false, true);
+                "image",  inImageMsg.getMsgId(), inImageMsg.getPicUrl(), false, true, true);
     }
 
     @Subscribe
@@ -67,7 +67,7 @@ public class CustomerServiceAgentEventHandler {
 //        LOGGER.info(result.getJson());
 
         archiveService.archive(inVoiceMsg.getFromUserName(), inVoiceMsg.getReceiver().getId(),
-                "voice",  inVoiceMsg.getMsgId(), inVoiceMsg.getMediaId(), false, true);
+                "voice",  inVoiceMsg.getMsgId(), inVoiceMsg.getMediaId(), false, true, true);
     }
 
     @Subscribe
@@ -85,7 +85,7 @@ public class CustomerServiceAgentEventHandler {
 //        LOGGER.info(result.getJson());
 
         archiveService.archive(inFileMsg.getFromUserName(), inFileMsg.getReceiver().getId(),
-                "file",  inFileMsg.getMsgId(), inFileMsg.getMediaId(), false, true);
+                "file",  inFileMsg.getMsgId(), inFileMsg.getMediaId(), false, true, true);
     }
 
 }

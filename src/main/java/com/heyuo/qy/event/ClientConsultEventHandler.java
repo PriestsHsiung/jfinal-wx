@@ -2,14 +2,10 @@ package com.heyuo.qy.event;
 
 import com.google.common.eventbus.Subscribe;
 import com.heyuo.qy.service.ArchiveService;
-import com.jfinal.kit.JsonKit;
 import com.jfinal.log.Log;
-import com.jfinal.qy.weixin.sdk.api.ApiResult;
-import com.jfinal.qy.weixin.sdk.api.KfApi;
-import com.jfinal.qy.weixin.sdk.msg.in.*;
-import com.jfinal.qy.weixin.sdk.msg.kf.out.KfImageMsg;
-import com.jfinal.qy.weixin.sdk.msg.kf.out.KfTextMsg;
-import com.jfinal.qy.weixin.sdk.msg.kf.out.KfVoiceMsg;
+import com.jfinal.qy.weixin.sdk.msg.in.InImageMsg;
+import com.jfinal.qy.weixin.sdk.msg.in.InTextMsg;
+import com.jfinal.qy.weixin.sdk.msg.in.InVoiceMsg;
 
 /**
  * Created by Administrator on 2016-10-31.
@@ -53,7 +49,7 @@ public class ClientConsultEventHandler {
 
         archiveService.archive(inTextMsg.getFromUserName(), clientServiceAgentId,
                 "text",  inTextMsg.getMsgId(), inTextMsg.getContent(),
-                textMsgEvent.getForbidden(), sended);
+                textMsgEvent.getForbidden(), sended, false);
 
     }
 
@@ -77,7 +73,7 @@ public class ClientConsultEventHandler {
 //        }
         archiveService.archive(inImageMsg.getFromUserName(), clientServiceAgentId,
                 "image",  inImageMsg.getMsgId(), inImageMsg.getPicUrl(),
-                imageMsgEvent.getForbidden(), sended);
+                imageMsgEvent.getForbidden(), sended, false);
     }
 
     private void processInVoiceMsg(ClientConsultEvent voiceMsgEvent) {
@@ -101,6 +97,6 @@ public class ClientConsultEventHandler {
 
         archiveService.archive(inVoiceMsg.getFromUserName(), clientServiceAgentId,
                 "voice",  inVoiceMsg.getMsgId(), inVoiceMsg.getMediaId(),
-                voiceMsgEvent.getForbidden(), sended);
+                voiceMsgEvent.getForbidden(), sended, false);
     }
 }

@@ -7,7 +7,8 @@ import com.heyuo.qy.model.ConsultRecords;
  */
 public class ArchiveService {
     public void archive(String fromUser, String toUser, String type, String msgId,
-                         String content, Boolean forbidden, Boolean sendSuccess) {
+                        String content, Boolean forbidden, Boolean sendSuccess,
+                        Boolean isKf) {
         ConsultRecords cr = new ConsultRecords();
         cr.setFromUser(fromUser);
         cr.setToUser(toUser);
@@ -16,6 +17,7 @@ public class ArchiveService {
         cr.setContent(content);
         cr.setForbidden(forbidden);
         cr.setSendSuccess(sendSuccess);
+        cr.setFromUserKf(isKf);
         cr.save();
     }
 }
