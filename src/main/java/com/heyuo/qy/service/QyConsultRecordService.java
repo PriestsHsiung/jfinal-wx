@@ -81,8 +81,13 @@ public class QyConsultRecordService {
             sqlExpect += sb.toString();
         }
 
+        Long begTime = System.currentTimeMillis();
+        Long endTime;
+
         Page<ConsultRecords> crPage
                 = ConsultRecords.dao.paginate(pageNum, pageSize, "select * ", sqlExpect);
+        endTime = System.currentTimeMillis();
+        System.out.println("ConsultRecords.dao.paginate cost:" + (endTime - begTime));
 
         List<ConsultRecords> crList = crPage.getList();
         PageInfo<QyConsultRecord> qycrPage = new PageInfo<QyConsultRecord>();
@@ -93,6 +98,8 @@ public class QyConsultRecordService {
 
         List<QyConsultRecord> qycrList = new LinkedList<QyConsultRecord>();
         qycrPage.setData(qycrList);
+
+        begTime = System.currentTimeMillis();
         for (ConsultRecords cr : crList) {
             QyConsultRecord qycr = new QyConsultRecord();
             if (cr.getFromUserKf()) {
@@ -112,6 +119,8 @@ public class QyConsultRecordService {
 
             qycrList.add(qycr);
         }
+        endTime = System.currentTimeMillis();
+        System.out.println("ConsultRecords assemble cost:" + (endTime - begTime));
 
         return qycrPage;
     }
