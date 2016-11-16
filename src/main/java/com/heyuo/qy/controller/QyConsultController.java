@@ -4,7 +4,6 @@ package com.heyuo.qy.controller;
 import com.alibaba.fastjson.JSONArray;
 import com.heyuo.qy.QyWeiXinConfig;
 import com.heyuo.qy.event.ClientConsultEvent;
-import com.heyuo.qy.model.QyLevel;
 import com.heyuo.qy.service.QyLevelService;
 import com.jfinal.kit.JsonKit;
 import com.jfinal.kit.PropKit;
@@ -12,14 +11,7 @@ import com.jfinal.log.Log;
 import com.jfinal.qy.weixin.sdk.api.*;
 import com.jfinal.qy.weixin.sdk.jfinal.MsgController;
 import com.jfinal.qy.weixin.sdk.msg.in.*;
-import com.jfinal.qy.weixin.sdk.msg.in.event.BatchJob;
-import com.jfinal.qy.weixin.sdk.msg.in.event.InEnterAgentEvent;
-import com.jfinal.qy.weixin.sdk.msg.in.event.InFollowEvent;
-import com.jfinal.qy.weixin.sdk.msg.in.event.InJobEvent;
-import com.jfinal.qy.weixin.sdk.msg.in.event.InLocationEvent;
-import com.jfinal.qy.weixin.sdk.msg.in.event.InMenuEvent;
-import com.jfinal.qy.weixin.sdk.msg.in.event.InQrCodeEvent;
-import com.jfinal.qy.weixin.sdk.msg.in.event.ScanCodeInfo;
+import com.jfinal.qy.weixin.sdk.msg.in.event.*;
 import com.jfinal.qy.weixin.sdk.msg.kf.in.KfInFileMsg;
 import com.jfinal.qy.weixin.sdk.msg.kf.in.KfInImageMsg;
 import com.jfinal.qy.weixin.sdk.msg.kf.in.KfInTextMsg;
@@ -245,7 +237,7 @@ public class QyConsultController extends MsgController {
 		if (InFollowEvent.EVENT_INFOLLOW_SUBSCRIBE.equals(inFollowEvent.getEvent()))
 		{
 			OutTextMsg outMsg = new OutTextMsg(inFollowEvent);
-			outMsg.setContent("感谢关注 JFinal Weixin 极速开发企业号，为您节约更多时间，去陪恋人、家人和朋友 :) \n\n\n " + helpStr);
+			outMsg.setContent("尊敬的会员，你好！ \n 欢迎加入海邀网在线人力资源服务平台，您已选择海邀网旗下产品“嘿好管”在线咨询服务");
 			render(outMsg);
 		}// 如果为取消关注事件，将无法接收到传回的信息
 		if (InFollowEvent.EVENT_INFOLLOW_UNSUBSCRIBE.equals(inFollowEvent.getEvent()))

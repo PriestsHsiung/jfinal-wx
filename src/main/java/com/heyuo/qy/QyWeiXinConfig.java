@@ -1,10 +1,7 @@
 package com.heyuo.qy;
 
 import com.google.common.eventbus.AsyncEventBus;
-import com.heyuo.qy.controller.IndexController;
-import com.heyuo.qy.controller.QyConsultController;
-import com.heyuo.qy.controller.QyConsultRecordApiController;
-import com.heyuo.qy.controller.QyKfController;
+import com.heyuo.qy.controller.*;
 import com.heyuo.qy.event.ClientConsultEventHandler;
 import com.heyuo.qy.event.CustomerServiceAgentEventHandler;
 import com.heyuo.qy.model._MappingKit;
@@ -75,6 +72,7 @@ public class QyWeiXinConfig extends JFinalConfig{
 		me.add("/qy/consult", QyConsultController.class);
 		me.add("/qy/kf", QyKfController.class);
 		me.add("/qy/record/list", QyConsultRecordApiController.class);
+		me.add("/qy/fwh/consult", FWHController.class);
 	}
 	
 	/**
