@@ -9,8 +9,11 @@ public class KfApi {
     // 发消息
     private static String sendUrl = "https://qyapi.weixin.qq.com/cgi-bin/kf/send?access_token=ACCESS_TOKEN";
 
-    // 获得客服列表
-    private static String kfListUrl = "https://qyapi.weixin.qq.com/cgi-bin/kf/list?access_token=ACCESS_TOKEN&type=internal";
+    // 获得内部客服列表
+    private static String internalkfListUrl = "https://qyapi.weixin.qq.com/cgi-bin/kf/list?access_token=ACCESS_TOKEN&type=internal";
+
+    // 获得外部客服列表
+    private static String externalkfListUrl = "https://qyapi.weixin.qq.com/cgi-bin/kf/list?access_token=ACCESS_TOKEN&type=external";
 
     public static ApiResult sendMsg(String data){
         String url = sendUrl.replace("ACCESS_TOKEN", AccessTokenApi.getAccessTokenStr());
@@ -18,8 +21,14 @@ public class KfApi {
         return new ApiResult(jsonStr);
     }
 
-    public static ApiResult getkfList(){
-        String url = kfListUrl.replace("ACCESS_TOKEN", AccessTokenApi.getAccessTokenStr());
+    public static ApiResult getInternalkfList(){
+        String url = internalkfListUrl.replace("ACCESS_TOKEN", AccessTokenApi.getAccessTokenStr());
+        String jsonStr = HttpUtils.get(url);
+        return new ApiResult(jsonStr);
+    }
+
+    public static ApiResult getExternalkfList(){
+        String url = externalkfListUrl.replace("ACCESS_TOKEN", AccessTokenApi.getAccessTokenStr());
         String jsonStr = HttpUtils.get(url);
         return new ApiResult(jsonStr);
     }

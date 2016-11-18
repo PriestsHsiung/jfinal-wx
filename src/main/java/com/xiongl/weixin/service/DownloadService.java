@@ -26,7 +26,7 @@ import java.util.Date;
  */
 public class DownloadService {
     private String path;
-    private static MediaApi mediaApi = RetrofitService.getInstance(false).create(MediaApi.class);
+    private static MediaApi mediaApi = RetrofitService.getQyApiInstance(false).create(MediaApi.class);
     private static final Logger LOGGER = LoggerFactory.getLogger(MediaApi.class);
 
     public boolean download(final String type, final String msgId, final String content) {

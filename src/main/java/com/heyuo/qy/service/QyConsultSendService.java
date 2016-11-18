@@ -1,5 +1,6 @@
 package com.heyuo.qy.service;
 
+import com.alibaba.fastjson.JSONArray;
 import com.heyuo.qy.QyWeiXinConfig;
 import com.heyuo.qy.bo.api.QyConsultMsg;
 import com.heyuo.qy.event.ClientConsultEvent;
@@ -12,7 +13,6 @@ import com.jfinal.qy.weixin.sdk.msg.in.InVoiceMsg;
 import com.jfinal.qy.weixin.sdk.msg.kf.out.KfImageMsg;
 import com.jfinal.qy.weixin.sdk.msg.kf.out.KfTextMsg;
 import com.jfinal.qy.weixin.sdk.msg.kf.out.KfVoiceMsg;
-import net.sf.json.JSONArray;
 import org.apache.commons.lang.StringUtils;
 
 import java.util.Map;
@@ -25,7 +25,7 @@ public class QyConsultSendService {
 	private QyLevelService qyLevelService = new QyLevelService();
 
     public Boolean sendMsg(QyConsultMsg msg, String errTip) {
-		String kf = getKf(msg.fromUser);
+		String kf = getExternalKf(msg.fromUser);
 		if (StringUtils.isBlank(kf)) {
 			errTip = "客服人员正忙，请稍候再试";
 			return false;
@@ -35,7 +35,7 @@ public class QyConsultSendService {
 		errTip = "非常抱歉，您不能发送此类消息，请联系管理员提升套餐，谢谢";
 
 		msg.kf = kf;
-        if ("txt".equals(msg.msgType)) {
+        if ("text".equals(msg.msgType)) {
             res = sendTxtMsg(msg);
         } else if ("voice".equals(msg.msgType)) {
             res  = sendVoiceMsg(msg);
@@ -47,7 +47,8 @@ public class QyConsultSendService {
     }
 
     public boolean sendTxtMsg(QyConsultMsg msg) {
-        Boolean canSend = qyLevelService.canSendText(msg.fromUser);
+        // Boolean canSend = qyLevelService.canSendText(msg.fromUser);
+        Boolean canSend = true;
 
         InTextMsg inTextMsg = new InTextMsg(msg.toUser, msg.fromUser, msg.createTime, msg.msgType, msg.agentId);
         inTextMsg.setMsgId(msg.msgId);
@@ -143,10 +144,10 @@ public class QyConsultSendService {
         return true;
     }
 
-    private String getKf(String userId) {
-		ApiResult result = KfApi.getkfList();
+    private String getExternalKf(String userId) {
+		ApiResult result = KfApi.getExternalkfList();
 
-		Map<String, Object> internal = result.getMap("internal");
+		Map<String, Object> internal = result.getMap("external");
 		if(null == internal) {
 			return null;
 		}

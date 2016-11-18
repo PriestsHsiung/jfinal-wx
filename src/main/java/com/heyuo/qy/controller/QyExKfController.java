@@ -1,14 +1,13 @@
 
 package com.heyuo.qy.controller;
 
-import com.alibaba.fastjson.JSONArray;
 import com.heyuo.qy.QyWeiXinConfig;
-import com.heyuo.qy.event.ClientConsultEvent;
-import com.heyuo.qy.service.QyLevelService;
-import com.jfinal.kit.JsonKit;
 import com.jfinal.kit.PropKit;
 import com.jfinal.log.Log;
-import com.jfinal.qy.weixin.sdk.api.*;
+import com.jfinal.qy.weixin.sdk.api.ApiConfig;
+import com.jfinal.qy.weixin.sdk.api.ApiResult;
+import com.jfinal.qy.weixin.sdk.api.ConBatchApi;
+import com.jfinal.qy.weixin.sdk.api.SendMessageApi;
 import com.jfinal.qy.weixin.sdk.jfinal.MsgController;
 import com.jfinal.qy.weixin.sdk.msg.in.*;
 import com.jfinal.qy.weixin.sdk.msg.in.event.*;
@@ -16,25 +15,23 @@ import com.jfinal.qy.weixin.sdk.msg.kf.in.KfInFileMsg;
 import com.jfinal.qy.weixin.sdk.msg.kf.in.KfInImageMsg;
 import com.jfinal.qy.weixin.sdk.msg.kf.in.KfInTextMsg;
 import com.jfinal.qy.weixin.sdk.msg.kf.in.KfInVoiceMsg;
-import com.jfinal.qy.weixin.sdk.msg.kf.out.KfImageMsg;
-import com.jfinal.qy.weixin.sdk.msg.kf.out.KfTextMsg;
-import com.jfinal.qy.weixin.sdk.msg.kf.out.KfVoiceMsg;
+import com.jfinal.qy.weixin.sdk.msg.out.OutImageMsg;
 import com.jfinal.qy.weixin.sdk.msg.out.OutTextMsg;
-import com.jfinal.qy.weixin.sdk.msg.send.QiYeTextMsg;
-import com.jfinal.qy.weixin.sdk.msg.send.Text;
-import org.apache.commons.lang.StringUtils;
+import com.jfinal.qy.weixin.sdk.msg.out.OutVoiceMsg;
+import com.jfinal.qy.weixin.sdk.msg.send.*;
+import com.xiongl.weixin.api.FwhApi;
+import com.xiongl.weixin.service.RetrofitService;
+import retrofit2.Call;
+import retrofit2.Response;
 
-import java.util.Map;
+import java.io.IOException;
 
-public class QyConsultController extends MsgController {
+public class QyExKfController extends MsgController {
 
-	static Log logger = Log.getLog(QyConsultController.class);
-	private static final String helpStr = "\t发送 help 可获得帮助，发送 \"美女\" 可看美女 ，发送新闻可看新版本消息。公众号功能持续完善中";
-
-	private QyLevelService qyLevelService = new QyLevelService();
+	static Log logger = Log.getLog(QyExKfController.class);
 
 	public boolean isKf() {
-		return false;
+		return true;
 	}
 
 	public ApiConfig getApiConfig() {
@@ -43,15 +40,8 @@ public class QyConsultController extends MsgController {
 		// 配置微信 API 相关常量
 		ac.setToken(PropKit.get("token"));
 		ac.setCorpId(PropKit.get("corpId"));
-		ac.setCorpSecret(PropKit.get("kf_secret"));
-		
-		/**
-		 *  是否对消息进行加密，对应于微信平台的消息加解密方式：
-		 *  1：true进行加密且必须配置 encodingAesKey
-		 *  2：false采用明文模式，同时也支持混合模式
-		 *  
-		 *  目前企业号只支持加密且必须配置
-		 */
+		ac.setCorpSecret(PropKit.get("yy_secret"));
+
 		ac.setEncryptMessage(PropKit.getBoolean("encryptMessage", true));
 		ac.setEncodingAesKey(PropKit.get("encodingAesKey", "setting it in config file"));
 		return ac;
@@ -63,68 +53,46 @@ public class QyConsultController extends MsgController {
 	 *     本方法仅测试了 OutTextMsg、OutNewsMsg、OutMusicMsg 三种类型的OutMsg，
 	 *     其它类型的消息会在随后的方法中进行测试
 	 */
-
-	private String getKf(InMsg inMsg) {
-		ApiResult result = KfApi.getInternalkfList();
-
-		Map<String, Object> internal = result.getMap("internal");
-		if(null == internal) {
-			OutTextMsg outMsg = new OutTextMsg(inMsg);
-			outMsg.setContent("客服人员正忙，请稍候再试");
-			render(outMsg);
-			return "";
-		}
-
-		JSONArray kfList = (JSONArray)internal.get("user");
-		if (kfList.isEmpty()) {
-			OutTextMsg outMsg = new OutTextMsg(inMsg);
-			outMsg.setContent("客服人员正忙，请稍候再试");
-			render(outMsg);
-			return "";
-		}
-
-		return (String)kfList.get(0);
-
-	}
-
-	private void renderPermissionMsg(InMsg inMsg) {
-		OutTextMsg outMsg = new OutTextMsg(inMsg);
-		outMsg.setContent("非常抱歉，您不能发送此类消息，请联系管理员提升套餐，谢谢");
-		render(outMsg);
-	}
-
 	@Override
 	protected void processInTextMsg(InTextMsg inTextMsg) {
-		String kf = getKf(inTextMsg);
-		if (StringUtils.isBlank(kf)) {
-			return;
-		}
-
-		Boolean canSend = qyLevelService.canSendText(inTextMsg.getFromUserName());
-		if (!canSend) {
-			renderPermissionMsg(inTextMsg);
-		}
-
-		ClientConsultEvent event = new ClientConsultEvent();
-		event.setForbidden(!canSend);
-		event.setCustomerServiceAgentId(kf);
-		event.setMsg(inTextMsg);
-		QyWeiXinConfig.eventBus.post(event);
-
-		if (canSend) {
-			KfTextMsg kfTextMsg = new KfTextMsg();
-			kfTextMsg.getSender().setType("userid");
-			kfTextMsg.getSender().setId(inTextMsg.getFromUserName());
-			kfTextMsg.getReceiver().setType("kf");
-			kfTextMsg.getReceiver().setId(kf);
-			kfTextMsg.getText().setContent(inTextMsg.getContent());
-			ApiResult result = KfApi.sendMsg(JsonKit.toJson(kfTextMsg).toString());
-			System.out.println(result.getJson());
-
-
-			String msgContent = inTextMsg.getContent().trim();
-			System.out.println("收到的信息：" + msgContent);
-		}
+//		ApiResult result = KfApi.getkfList();
+//
+//		Map<String, Object> internal = result.getMap("internal");
+//		if(null == internal) {
+//			OutTextMsg outMsg = new OutTextMsg(inTextMsg);
+//			outMsg.setContent("客服人员正忙，请稍候再试");
+//			render(outMsg);
+//		}
+//
+//		JSONArray kfList = (JSONArray)internal.get("user");
+//		if (kfList.isEmpty()) {
+//			OutTextMsg outMsg = new OutTextMsg(inTextMsg);
+//			outMsg.setContent("客服人员正忙，请稍候再试");
+//			render(outMsg);
+//		}
+//
+//		String kf = (String)kfList.get(0);
+//
+//		KfTextMsg kfTextMsg = new KfTextMsg();
+//		kfTextMsg.getSender().setType("userid");
+//		kfTextMsg.getSender().setId(inTextMsg.getFromUserName());
+//		kfTextMsg.getReceiver().setType("kf");
+//		kfTextMsg.getReceiver().setId(kf);
+//		kfTextMsg.getText().setContent(inTextMsg.getContent());
+//		result = KfApi.sendMsg(JsonKit.toJson(kfTextMsg).toString());
+//		System.out.println(result.getJson());
+////		List in
+////		getList("internal");
+////		if (internalKf.isEmpty()) {
+////			OutTextMsg outMsg = new OutTextMsg(inTextMsg);
+////			outMsg.setContent("客服人员正忙，请稍候再试");
+////			render(outMsg);
+////		}
+////		StringinternalKf.get(0);
+//		String msgContent = inTextMsg.getContent().trim();
+//		System.out.println("收到的信息："+msgContent);
+//
+//		renderText("");
 	}
 
 	/**
@@ -132,64 +100,21 @@ public class QyConsultController extends MsgController {
 	 */
 	@Override
 	protected void processInImageMsg(InImageMsg inImageMsg) {
-		String kf = getKf(inImageMsg);
-		if (StringUtils.isBlank(kf)) {
-			return;
-		}
-
-		Boolean canSend = qyLevelService.canSendImage(inImageMsg.getFromUserName());
-		if (!canSend) {
-			renderPermissionMsg(inImageMsg);
-		}
-
-		ClientConsultEvent event = new ClientConsultEvent();
-		event.setForbidden(!canSend);
-		event.setCustomerServiceAgentId(kf);
-		event.setMsg(inImageMsg);
-		QyWeiXinConfig.eventBus.post(event);
-
-		if (canSend) {
-			KfImageMsg kfImageMsg = new KfImageMsg();
-			kfImageMsg.getSender().setType("userid");
-			kfImageMsg.getSender().setId(inImageMsg.getFromUserName());
-			kfImageMsg.getReceiver().setType("kf");
-			kfImageMsg.getReceiver().setId(kf);
-			kfImageMsg.getImage().setMedia_id(inImageMsg.getMediaId());
-			ApiResult result = KfApi.sendMsg(JsonKit.toJson(kfImageMsg).toString());
-			System.out.println(result.getJson());
-		}
+		OutImageMsg outMsg = new OutImageMsg(inImageMsg);
+		// 将刚发过来的图片再发回去
+		outMsg.setMediaId(inImageMsg.getMediaId());
+		render(outMsg);
+		
 	}
 
 	/**
 	 * 实现父类抽方法，处理语音消息
 	 */
 	protected void processInVoiceMsg(InVoiceMsg inVoiceMsg) {
-		String kf = getKf(inVoiceMsg);
-		if (StringUtils.isBlank(kf)) {
-			return;
-		}
-
-		Boolean canSend = qyLevelService.canSendVoice(inVoiceMsg.getFromUserName());
-		if (!canSend) {
-			renderPermissionMsg(inVoiceMsg);
-		}
-
-		ClientConsultEvent event = new ClientConsultEvent();
-		event.setForbidden(!canSend);
-		event.setCustomerServiceAgentId(kf);
-		event.setMsg(inVoiceMsg);
-		QyWeiXinConfig.eventBus.post(event);
-
-		if (canSend) {
-			KfVoiceMsg kfImageMsg = new KfVoiceMsg();
-			kfImageMsg.getSender().setType("userid");
-			kfImageMsg.getSender().setId(inVoiceMsg.getFromUserName());
-			kfImageMsg.getReceiver().setType("kf");
-			kfImageMsg.getReceiver().setId(kf);
-			kfImageMsg.getVoice().setMedia_id(inVoiceMsg.getMediaId());
-			ApiResult result = KfApi.sendMsg(JsonKit.toJson(kfImageMsg).toString());
-			System.out.println(result.getJson());
-		}
+		OutVoiceMsg outMsg = new OutVoiceMsg(inVoiceMsg);
+		// 将刚发过来的语音再发回去
+		outMsg.setMediaId(inVoiceMsg.getMediaId());
+		render(outMsg);
 	}
 
 	/**
@@ -237,7 +162,7 @@ public class QyConsultController extends MsgController {
 		if (InFollowEvent.EVENT_INFOLLOW_SUBSCRIBE.equals(inFollowEvent.getEvent()))
 		{
 			OutTextMsg outMsg = new OutTextMsg(inFollowEvent);
-			outMsg.setContent("尊敬的会员，你好！ \n 欢迎加入海邀网在线人力资源服务平台，您已选择海邀网旗下产品“嘿好管”在线咨询服务");
+			outMsg.setContent("感谢关注 JFinal Weixin 极速开发企业号，为您节约更多时间，去陪恋人、家人和朋友 :) \n\n\n ");
 			render(outMsg);
 		}// 如果为取消关注事件，将无法接收到传回的信息
 		if (InFollowEvent.EVENT_INFOLLOW_UNSUBSCRIBE.equals(inFollowEvent.getEvent()))
@@ -313,19 +238,77 @@ public class QyConsultController extends MsgController {
 	}
 
 	protected void processKfInTextMsg(KfInTextMsg inTextMsg) {
+		FwhApi fwhApi = RetrofitService.getFwhRetrofit().create(FwhApi.class);
+		Call<Object> call =
+				fwhApi.sendMsg(inTextMsg.getReceiver().getId(), inTextMsg.getMsgType(),
+									inTextMsg.getMsgId(), inTextMsg.getContent());
 
+		try {
+			Response<Object> resp = call.execute();
+			if (resp.isSuccessful()) {
+			} else {
+				logger.error(resp.message());
+			}
+		}catch(IOException e){
+			logger.error(e.getMessage());
+		}
+
+		QyWeiXinConfig.eventBus.post(inTextMsg);
 	}
 
 	protected void processKfInImageMsg(KfInImageMsg inImageMsg) {
+		FwhApi fwhApi = RetrofitService.getFwhRetrofit().create(FwhApi.class);
+		Call<Object> call =
+				fwhApi.sendMsg(inImageMsg.getReceiver().getId(), inImageMsg.getMsgType(),
+									inImageMsg.getMediaId(), "");
 
+		try {
+			Response<Object> resp = call.execute();
+			if (resp.isSuccessful()) {
+			} else {
+				logger.error(resp.message());
+			}
+		}catch(IOException e){
+			logger.error(e.getMessage());
+		}
+
+		QyWeiXinConfig.eventBus.post(inImageMsg);
 	}
 
 	protected void processKfInVoiceMsg(KfInVoiceMsg inVoiceMsg) {
+		FwhApi fwhApi = RetrofitService.getFwhRetrofit().create(FwhApi.class);
+		Call<Object> call =
+				fwhApi.sendMsg(inVoiceMsg.getReceiver().getId(), inVoiceMsg.getMsgType(),
+								inVoiceMsg.getMediaId(), "");
+									//"WuO8dimR0-1CiNb8mSC22zkZ6PMapL9JUajKkDnWvNLxSZFpUbXjJnnkTr-kLldM", "");
 
+		try {
+			Response<Object> resp = call.execute();
+			if (resp.isSuccessful()) {
+			} else {
+				logger.error(resp.message());
+			}
+		}catch(IOException e){
+			logger.error(e.getMessage());
+		}
+
+		QyWeiXinConfig.eventBus.post(inVoiceMsg);
 	}
 
 	protected void processKfInFileMsg(KfInFileMsg inFileMsg) {
+		QiYeFileMsg msg = new QiYeFileMsg();
+		msg.setSafe("0");
+		msg.setTouser(inFileMsg.getReceiver().getId());
+		msg.setAgentid("2");
 
+		Media m = new Media();
+		m.setMedia_id(inFileMsg.getMediaId());
+		msg.setFile(m);
+
+		ApiResult result = SendMessageApi.sendFileMsg(msg);
+		logger.error(result.getJson());
+
+		QyWeiXinConfig.eventBus.post(inFileMsg);
 	}
 
 

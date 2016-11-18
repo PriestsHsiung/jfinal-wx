@@ -15,7 +15,7 @@ import java.util.Map;
 public class AccessTokenService extends BaseService {
     public static Map<String, ApiConfig> configMap = new HashMap<String, ApiConfig>();
 
-    private static AccessTokenApi accessTokenApi = RetrofitService.getInstance(true).create(AccessTokenApi.class);
+    private static AccessTokenApi accessTokenApi = RetrofitService.getQyApiInstance(true).create(AccessTokenApi.class);
     private static Map<String, AccessTokenInfo> cache = new HashMap<String, AccessTokenInfo>();
     private static final Logger LOGGER = LoggerFactory.getLogger(AccessTokenService.class);
 
