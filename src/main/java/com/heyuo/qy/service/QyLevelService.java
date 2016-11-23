@@ -18,6 +18,11 @@ public class QyLevelService {
 
     public Boolean canSendVoice(String userId) {
         QyLevel level = QyLevel.dao.findById(userId);
-        return (null != level)? Boolean.TRUE : Boolean.FALSE;
+        return (null != level) ? Boolean.TRUE : Boolean.FALSE;
+    }
+
+    public Integer getLeve(String userId) {
+        QyLevel level = QyLevel.dao.findById(userId);
+        return (null != level) ? level.getLevel() : 0;
     }
 }

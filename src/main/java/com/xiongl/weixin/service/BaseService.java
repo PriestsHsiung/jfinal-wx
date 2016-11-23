@@ -1,7 +1,5 @@
 package com.xiongl.weixin.service;
 
-import com.xiongl.weixin.sdk.Constant;
-import com.xiongl.weixin.sdk.ErrorResult;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import retrofit2.Call;
@@ -29,7 +27,7 @@ public class BaseService {
         }
 
         if (null == t) {
-            throw new RuntimeException(trace + "请求错误");
+            LOGGER.error(trace + "请求错误");
         }
 
         return t;

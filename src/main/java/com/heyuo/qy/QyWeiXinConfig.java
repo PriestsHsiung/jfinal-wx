@@ -74,6 +74,7 @@ public class QyWeiXinConfig extends JFinalConfig{
 		me.add("/qy/exkf", QyExKfController.class);
 		me.add("/qy/record/list", QyConsultRecordApiController.class);
 		me.add("/qy/fwh/consult", FWHController.class);
+		me.add("/qy/other", QyOtherApiController.class, "/");
 	}
 	
 	/**
