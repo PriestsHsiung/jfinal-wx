@@ -25,4 +25,15 @@ public class QyLevelService {
         QyLevel level = QyLevel.dao.findById(userId);
         return (null != level) ? level.getLevel() : 0;
     }
+
+    public void saveOrUpdate(QyLevel qyLevel) {
+        QyLevel l = QyLevel.dao.findById(qyLevel.getWxUser());
+        if (null == l) {
+            new QyLevel().set("qy", qyLevel.getQy())
+                    .set("wx_user", qyLevel.getWxUser())
+                    .set("level", qyLevel.getLevel()).save();
+        } else {
+            l.set("level", qyLevel.getLevel()).update();
+        }
+    }
 }

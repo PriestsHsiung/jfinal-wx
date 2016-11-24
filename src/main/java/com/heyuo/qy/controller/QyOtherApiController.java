@@ -2,6 +2,7 @@ package com.heyuo.qy.controller;
 
 import com.heyuo.qy.bo.api.UserInfoWithLevel;
 import com.heyuo.qy.bo.api.UserInfoWithLevelJson;
+import com.heyuo.qy.model.QyLevel;
 import com.heyuo.qy.service.QyLevelService;
 import com.jfinal.core.Controller;
 import com.xiongl.weixin.sdk.UserInfo;
@@ -19,7 +20,15 @@ public class QyOtherApiController extends Controller {
 
     private QyLevelService qyLevelService = new QyLevelService();
 
-    public void client() {
+    public void clientLevelChange() {
+        QyLevel qyLevel = new QyLevel();
+        qyLevel.setWxUser(getPara("userId"));
+        qyLevel.setLevel(getParaToInt("level"));
+        qyLevelService.saveOrUpdate(qyLevel);
+        renderJson("{\"error\":\"0\"}");
+    }
+
+    public void clientList() {
         // client标志为 1
         List<UserInfoWithLevel> uilList = new LinkedList<UserInfoWithLevel>();
 
@@ -33,12 +42,13 @@ public class QyOtherApiController extends Controller {
             uil.setName(ui.getName());
 
             Integer level = qyLevelService.getLeve(uil.getUserId());
+            uil.setLevel(level);
             if (level == 1) {
-                uil.setLevel("700元，档次1");
+                uil.setLevelTip("700元，档次1");
             } else if (level == 2) {
-                uil.setLevel("3800元，档次2");
+                uil.setLevelTip("3800元，档次2");
             } else {
-                uil.setLevel("未设置咨询档次");
+                uil.setLevelTip("未设置咨询档次");
             }
 
 
