@@ -81,6 +81,8 @@ public class QyConsultRecordService {
             sqlExpect += sb.toString();
         }
 
+        sqlExpect += " order by date desc";
+
         Long begTime = System.currentTimeMillis();
         Long endTime;
 
