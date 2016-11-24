@@ -6,7 +6,7 @@ package com.heyuo.qy.bo.api;
 public class UserInfoWithLevel {
     private String userId;
     private String name;
-    private Integer level;
+    private String level;
 
     public String getUserId() {
         return userId;
@@ -24,11 +24,11 @@ public class UserInfoWithLevel {
         this.name = name;
     }
 
-    public Integer getLevel() {
+    public String getLevel() {
         return level;
     }
 
-    public void setLevel(Integer level) {
+    public void setLevel(String level) {
         this.level = level;
     }
 }

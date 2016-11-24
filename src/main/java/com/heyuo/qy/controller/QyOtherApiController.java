@@ -33,7 +33,14 @@ public class QyOtherApiController extends Controller {
             uil.setName(ui.getName());
 
             Integer level = qyLevelService.getLeve(uil.getUserId());
-            uil.setLevel(level);
+            if (level == 1) {
+                uil.setLevel("700元，档次1");
+            } else if (level == 2) {
+                uil.setLevel("3800元，档次2");
+            } else {
+                uil.setLevel("未设置咨询档次");
+            }
+
 
             uilList.add(uil);
         }
